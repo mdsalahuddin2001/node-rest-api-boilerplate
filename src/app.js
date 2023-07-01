@@ -24,7 +24,7 @@ const rateLimiter = rateLimit({
 });
 // api security
 app.use(helmet());
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 app.use(xssClean());
 app.use(mongoSanitize());
 // app.use(rateLimiter);

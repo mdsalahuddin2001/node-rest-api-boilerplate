@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: [true, "Please provide phone"],
+      // required: [true, "Please provide phone"],
     },
     image: {
       type: String,
