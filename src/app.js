@@ -16,6 +16,13 @@ const seedRouter = require("./routers/seedRouter");
 const authRouter = require("./routers/authRouter");
 const userRouter = require("./routers/userRouter");
 
+// delay for loading test
+app.use((req, res, next) => {
+  setTimeout(() => {
+    next();
+  }, 3000);
+});
+
 // rate limiter
 const rateLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
@@ -33,7 +40,8 @@ app.use(express.json());
 app.use("/", express.static(path.join(__dirname, "public")));
 // body parser
 app.use(express.json());
-
+// cookie parser
+app.use(cookieParser());
 // use morgan
 app.use(morgan("dev"));
 

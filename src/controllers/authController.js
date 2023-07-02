@@ -82,7 +82,7 @@ const activateAccount = asyncHandler(async (req, res, next) => {
   }
 });
 
-// @desc      Admin Login
+// @desc       Login
 // @route     POST /api/v1/auth/admin-login
 // @access    Public
 const login = asyncHandler(async (req, res, next) => {
@@ -104,6 +104,19 @@ const login = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+// @desc       Logout
+// @route     POST /api/auth/logout
+// @access    Private
+const logout = asyncHandler(async (req, res, next) => {
+  const cookies = req.cookies;
+  if (!cookies?.refresh) return res.sendStatus(204); //No content
+  res.clearCookie("refresh", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+  });
+  successResponse(res, {});
+});
 // Get token from mode, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
   // Create access token
@@ -135,4 +148,4 @@ const sendTokenResponse = (user, statusCode, res) => {
       },
     });
 };
-module.exports = { register, activateAccount, login };
+module.exports = { register, activateAccount, login, logout };
