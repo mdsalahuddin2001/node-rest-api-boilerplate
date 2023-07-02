@@ -17,11 +17,11 @@ const authRouter = require("./routers/authRouter");
 const userRouter = require("./routers/userRouter");
 
 // delay for loading test
-app.use((req, res, next) => {
-  setTimeout(() => {
-    next();
-  }, 3000);
-});
+// app.use((req, res, next) => {
+//   setTimeout(() => {
+//     next();
+//   }, 3000);
+// });
 
 // rate limiter
 const rateLimiter = rateLimit({

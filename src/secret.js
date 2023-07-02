@@ -17,6 +17,8 @@ const access_expire = process.env.ACCESS_TOKEN_EXPIRE;
 const refresh_secret = process.env.REFRESH_TOKEN_SECRET;
 const refresh_expire = process.env.REFRESH_TOKEN_EXPIRE;
 
+const clientUrl = process.env.CLIENT_URL;
+
 const defaultAvatar = process.env.defaultAvatar || "/images/users/avatar.jpg";
 module.exports = {
   PORT,
@@ -30,4 +32,5 @@ module.exports = {
   access_expire,
   refresh_secret,
   refresh_expire,
+  clientUrl,
 };

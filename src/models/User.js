@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const { JWT_EXPIRE, JWT_SECRET, defaultAvatar } = require("../secret");
 
@@ -74,14 +75,15 @@ const UserSchema = new mongoose.Schema(
 );
 
 // Encrypt password before save - not working on insert many. works when given validate instead of save
-UserSchema.pre("save", async function (next) {
-  console.log("I should run");
-  if (!this.isModified("password")) {
-    next();
-  }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
+// UserSchema.pre("save", async function (next) {
+//   console.log("I should run");
+//   if (!this.isModified("password")) {
+//     next();
+//   }
+//   console.log("password hashed");
+//   const salt = await bcrypt.genSalt(10);
+//   this.password = await bcrypt.hash(this.password, salt);
+// });
 
 // Encrypt password when update
 UserSchema.pre("findByIdAndUpdate", async function (next) {
@@ -110,7 +112,7 @@ UserSchema.methods.getResetPasswordToken = function () {
   // Hash token and set to resetPasswordToken field
   this.resetPasswordToken = crypto
     .createHash("sha256")
-    .update(resetToken)
+    .update(resetToken.trim())
     .digest("hex");
   // Set expire
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;

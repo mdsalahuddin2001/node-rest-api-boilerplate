@@ -1,4 +1,5 @@
 const createError = require("http-errors");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("../middlewares/asyncHandler");
 const User = require("../models/User");
@@ -10,6 +11,7 @@ const {
   access_expire,
   refresh_secret,
   refresh_expire,
+  clientUrl,
 } = require("../secret");
 const { createJWT } = require("../utils/jwt");
 const sendEmail = require("../utils/sendEmail");
@@ -117,6 +119,65 @@ const logout = asyncHandler(async (req, res, next) => {
   });
   successResponse(res, {});
 });
+
+const forgotPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    throw createError(400, "Invalid email.");
+  }
+  // generate reset token
+  const resetToken = user.getResetPasswordToken();
+
+  await user.save({ validateBeforeSave: false });
+  // Create reset url
+  const resetUrl = `${clientUrl}/auth/resetpassword?resettoken=${resetToken}`;
+
+  const html = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+
+  try {
+    await sendEmail({ email: user.email, html, subject: "Password Reset" });
+
+    successResponse(res, {
+      message: "password reset email was sent.",
+      data: { resetUrl },
+    });
+    return;
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save({ validateBeforeSave: false });
+    throw createError(500, "Email could not be sent.Please try again later.");
+  }
+});
+
+// @desc      Reset password
+// @route     PUT /api/v1/auth/resetpassword/:resettoken
+// @access    Public
+const resetPassword = asyncHandler(async (req, res, next) => {
+  // Get hashed token
+  const resetPasswordToken = req.query.resettoken.trim();
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw createError(400, "Invalid token");
+  }
+
+  // Set new password
+  user.password = req.body.password;
+  console.log("password", req.body.password);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  successResponse(res, {
+    message: "Password successfully reset. Please login with new password",
+  });
+});
+
 // Get token from mode, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
   // Create access token
@@ -148,4 +209,11 @@ const sendTokenResponse = (user, statusCode, res) => {
       },
     });
 };
-module.exports = { register, activateAccount, login, logout };
+module.exports = {
+  register,
+  activateAccount,
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
+};
