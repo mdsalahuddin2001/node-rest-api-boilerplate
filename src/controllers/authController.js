@@ -119,14 +119,19 @@ const logout = asyncHandler(async (req, res, next) => {
   });
   successResponse(res, {});
 });
-
+// @desc      Forgot Password
+// @route     POST /api/auth/forgot-password
+// @access    Public
 const forgotPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     throw createError(400, "Invalid email.");
   }
   // generate reset token
-  const resetToken = user.getResetPasswordToken();
+  const resetToken = crypto
+    .createHash("sha256")
+    .update(user.getResetPasswordToken())
+    .digest("hex");
 
   await user.save({ validateBeforeSave: false });
   // Create reset url
