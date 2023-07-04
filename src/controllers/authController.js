@@ -162,10 +162,13 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
 const resetPassword = asyncHandler(async (req, res, next) => {
   // Get hashed token
   const resetPasswordToken = req.query.resettoken.trim();
+  console.log("reset password token: ", resetPassword);
   const user = await User.findOne({
     resetPasswordToken,
     resetPasswordExpire: { $gt: Date.now() },
   });
+
+  console.log(user);
 
   if (!user) {
     throw createError(400, "Invalid token");
