@@ -14,9 +14,11 @@ const {
   resetPassword,
 } = require("../controllers/authController");
 
+const validate = require("../middlewares/validate");
+const { authValidation } = require("../validations/");
 const router = express.Router();
 
-router.post("/register", register);
+router.post("/register", validate(authValidation.register), register);
 router.post("/verify", activateAccount);
 router.post("/login", login);
 router.post("/logout", logout);
