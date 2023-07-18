@@ -20,6 +20,14 @@ const refresh_expire = process.env.REFRESH_TOKEN_EXPIRE;
 const clientUrl = process.env.CLIENT_URL;
 
 const defaultAvatar = process.env.defaultAvatar || "/images/users/avatar.jpg";
+
+const uploadDir = process.env.UPLOAD_DIR || "public/images/users";
+
+const smtpHost = process.env.SMTP_HOST || "";
+const smtpPort = process.env.SMTP_PORT || "";
+const smtpUsername = process.env.SMTP_USERNAME;
+const smtpPassword = process.env.SMTP_PASSWORD;
+const fromEmail = process.env.EMAIL_FROM || "mdahmede442@gmail.com";
 module.exports = {
   PORT,
   MONGO_URI,
@@ -33,4 +41,10 @@ module.exports = {
   refresh_secret,
   refresh_expire,
   clientUrl,
+  uploadDir,
+  smtpHost,
+  smtpPassword,
+  smtpPort,
+  smtpUsername,
+  fromEmail,
 };

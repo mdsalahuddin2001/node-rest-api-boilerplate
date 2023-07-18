@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const createError = require("http-errors");
 const asyncHandler = require("./asyncHandler");
-
+const { access_secret } = require("../secret");
 const User = require("../models/User");
 
 // Protect routes
@@ -14,11 +14,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
   ) {
     // Set token from Bearer token in header
     token = req.headers.authorization.split(" ")[1];
-    // Set token from cookie
   }
-  // else if (req.cookies.token) {
-  //   token = req.cookies.token;
-  // }
 
   // Make sure token exists
   if (!token) {
@@ -27,7 +23,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
   try {
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, access_secret);
 
     req.user = await User.findById(decoded.id);
 

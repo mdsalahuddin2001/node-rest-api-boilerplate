@@ -1,4 +1,3 @@
-const fs = require("fs");
 const createError = require("http-errors");
 const User = require("../models/User");
 const { successResponse } = require("../utils/sendResponse");
@@ -19,7 +18,10 @@ const getUsers = asyncHandler(async (req, res, next) => {
 
   // create filter object
   const filter = {
-    role: { $ne: "admin" },
+    $and:
+      req.user.role === "super-admin"
+        ? [{}]
+        : [{ role: { $ne: "admin" } }, { role: { $ne: "super-admin" } }],
     $or: [
       { name: { $regex: searchRegExp } },
       { email: { $regex: searchRegExp } },
@@ -68,6 +70,36 @@ const getUser = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc      Update user
+// @route     PATCH /api/users:id
+// @access    Private
+const updateUser = asyncHandler(async (req, res, next) => {
+  const id = req.params.id;
+
+  // find user by id
+  const user = await findResourceById(User, id);
+  // if user not found
+  if (!user) {
+    return next(createError(404, "User not found"));
+  }
+
+  // update user
+  const updatedUser = await User.findByIdAndUpdate(
+    id,
+    { ...req.body, email: undefined },
+    {
+      new: true,
+      runValidators: true,
+      context: "query",
+    }
+  );
+
+  successResponse(res, {
+    message: "Successfully updated the user!",
+    data: updatedUser,
+  });
+});
+
 // @desc      Delete user
 // @route     DELETE /api/users:id
 // @access    Private - [Admin]
@@ -96,4 +128,5 @@ module.exports = {
   getUsers,
   getUser,
   deleteUser,
+  updateUser,
 };

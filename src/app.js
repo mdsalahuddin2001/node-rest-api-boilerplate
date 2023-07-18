@@ -15,7 +15,7 @@ const errorHandler = require("./middlewares/errorHandler");
 const seedRouter = require("./routers/seedRouter");
 const authRouter = require("./routers/authRouter");
 const userRouter = require("./routers/userRouter");
-
+const categoryRouter = require("./routers/categoryRouter");
 // delay for loading test
 // app.use((req, res, next) => {
 //   setTimeout(() => {
@@ -37,6 +37,7 @@ app.use(mongoSanitize());
 // app.use(rateLimiter);
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/", express.static(path.join(__dirname, "public")));
 // body parser
 app.use(express.json());
@@ -49,6 +50,7 @@ app.use(morgan("dev"));
 app.use("/api/seed", seedRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
+app.use("/api/categories", categoryRouter);
 // health check
 app.get("/test", (req, res) => {
   res.status(200).send({

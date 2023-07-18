@@ -22,6 +22,13 @@ const verifyEmail = require("../emails/verifyEmail");
 const register = asyncHandler(async (req, res, next) => {
   const { name, email, phone, address, password } = req.body;
 
+  // if (!req.file) {
+  //   throw createError(400, "Please upload an image");
+  // }
+  // if (req.file) {
+  //   const imageBufferString = req.file.buffer.toString("base64");
+  // }
+
   // check if user already exists
   const userExists = await User.exists({ email });
   // throw error if user already exists
@@ -36,11 +43,12 @@ const register = asyncHandler(async (req, res, next) => {
     jwtActivationExpire
   );
 
-  // await sendEmail({
-  //   email,
-  //   subject: "Email Verification",
-  //   html: verifyEmail({ email }),
-  // });
+  const activationUrl = `http://localhost:3000/auth/activate-account?token=${token}`;
+  await sendEmail({
+    email,
+    subject: "Email Verification",
+    html: verifyEmail({ email, activationUrl }),
+  });
 
   successResponse(res, {
     statusCode: 200,
@@ -162,13 +170,11 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
 const resetPassword = asyncHandler(async (req, res, next) => {
   // Get hashed token
   const resetPasswordToken = req.query.resettoken.trim();
-  console.log("reset password token: ", resetPassword);
+
   const user = await User.findOne({
     resetPasswordToken,
     resetPasswordExpire: { $gt: Date.now() },
   });
-
-  console.log(user);
 
   if (!user) {
     throw createError(400, "Invalid token");
@@ -176,7 +182,6 @@ const resetPassword = asyncHandler(async (req, res, next) => {
 
   // Set new password
   user.password = req.body.password;
-  console.log("password", req.body.password);
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
   await user.save();
@@ -185,8 +190,49 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     message: "Password successfully reset. Please login with new password",
   });
 });
+// @desc       Refresh
+// @route     POST /api/auth/refresh
+// @access    Private
+const refresh = (req, res) => {
+  const cookies = req.cookies;
 
-// Get token from mode, create cookie and send response
+  if (!cookies?.refresh) {
+    throw createError(401, "Unauthorized");
+  }
+
+  const refreshToken = cookies.refresh;
+
+  jwt.verify(refreshToken, refresh_secret, async (err, decoded) => {
+    if (err) {
+      throw createError(403, "Forbidden");
+    }
+
+    const foundUser = await User.findOne({
+      _id: decoded.id,
+    }).exec();
+
+    if (!foundUser) {
+      throw createError(401, "Unauthorized");
+    }
+
+    // send token response
+    sendTokenResponse(foundUser, 200, res);
+  });
+  const accessToken = jwt.sign(
+    {
+      UserInfo: {
+        username: foundUser.username,
+        roles: foundUser.roles,
+      },
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "15m" }
+  );
+
+  res.json({ accessToken });
+};
+
+// Get token , create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
   // Create access token
   const accessToken = createJWT({ id: user._id }, access_secret, access_expire);

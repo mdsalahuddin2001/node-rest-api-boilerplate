@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
+      enum: ["user", "admin", "super-admin"],
       default: "user",
     },
     password: {
@@ -44,8 +44,9 @@ const UserSchema = new mongoose.Schema(
       // required: [true, "Please provide phone"],
     },
     image: {
-      type: String,
-      default: defaultAvatar,
+      type: Buffer,
+      contentType: String,
+      // required: [true, "Image is required"],
     },
     isBanned: {
       type: Boolean,

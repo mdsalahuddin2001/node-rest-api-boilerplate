@@ -16,9 +16,15 @@ const {
 
 const validate = require("../middlewares/validate");
 const { authValidation } = require("../validations/");
+const upload = require("../middlewares/uploadFile");
 const router = express.Router();
 
-router.post("/register", validate(authValidation.register), register);
+router.post(
+  "/register",
+  // upload.single("image"),
+  validate(authValidation.register),
+  register
+);
 router.post("/verify", activateAccount);
 router.post("/login", login);
 router.post("/logout", logout);
