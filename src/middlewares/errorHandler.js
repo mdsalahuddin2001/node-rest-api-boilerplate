@@ -1,12 +1,13 @@
 const createError = require("http-errors");
 const { errorResponse } = require("../utils/sendResponse");
+const logger = require("../utils/logger");
 const errorHandler = (err, req, res, next) => {
   let error = { ...err, statusCode: err.statusCode };
 
   error.message = err.message;
 
   // Log to console for dev
-  console.log(error);
+  logger.log("error", error);
 
   // Mongoose bad ObjectId
   if (err.name === "CastError") {

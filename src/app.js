@@ -20,7 +20,7 @@ const categoryRouter = require("./routers/categoryRouter");
 // app.use((req, res, next) => {
 //   setTimeout(() => {
 //     next();
-//   }, 3000);
+//   }, 1500);
 // });
 
 // rate limiter

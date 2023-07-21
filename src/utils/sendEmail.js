@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const { smtpHost, smtpPort, smtpUsername, smtpPassword } = require("../secret");
+const logger = require("./logger");
 var transport = nodemailer.createTransport({
   host: smtpHost,
   port: smtpPort,
@@ -12,10 +13,10 @@ var transport = nodemailer.createTransport({
 transport
   .verify()
   .then(() => {
-    console.log("Connected to email server");
+    logger.log("info", "Connected to email server");
   })
   .catch((err) => {
-    console.log("Unable to connect to email server", err);
+    logger.log("error", "Unable to connect to email server", err);
   });
 const sendEmail = async (data) => {
   const message = {
@@ -27,7 +28,7 @@ const sendEmail = async (data) => {
 
   const info = await transport.sendMail(message);
 
-  console.log("Message sent: %s", info.messageId);
+  logger.log("info", "Message sent: %s", info.messageId);
 };
 
 // const sender = {

@@ -5,11 +5,12 @@ const slugify = require("slugify");
 const shortid = require("shortid");
 const { successResponse } = require("../utils/sendResponse");
 const asyncHandler = require("../middlewares/asyncHandler");
+const logger = require("../utils/logger");
 
 const client = redis.createClient();
 
 client.connect().then(() => {
-  console.log("Connected to redis");
+  logger.log("info", "Connected to redis");
 });
 
 // ****** Create Category List With Children For Parent Category ****** //

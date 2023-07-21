@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
+const logger = require("../utils/logger");
 
 const connectDB = async (uri) => {
   try {
     await mongoose.connect(uri);
   } catch (error) {
-    console.log(error);
+    logger.log("error", error);
   }
 };
 
