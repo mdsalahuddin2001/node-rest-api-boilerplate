@@ -12,6 +12,7 @@ const rateLimit = require("express-rate-limit");
 const mongoSanitize = require("express-mongo-sanitize");
 const errorHandler = require("./middlewares/errorHandler");
 // import routers
+const demoRouter = require("./routers/demoRouter");
 const seedRouter = require("./routers/seedRouter");
 const authRouter = require("./routers/authRouter");
 const userRouter = require("./routers/userRouter");
@@ -47,6 +48,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 
 // routes
+app.use("/demo", demoRouter);
 app.use("/api/seed", seedRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);

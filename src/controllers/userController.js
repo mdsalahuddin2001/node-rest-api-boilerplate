@@ -11,7 +11,7 @@ const getUsers = asyncHandler(async (req, res, next) => {
   // extract query params
   const search = req.query.search || "";
   const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
+  const limit = Number(req.query.limit) || 100;
 
   // build regex for search
   const searchRegExp = new RegExp(".*" + search + ".*", "i");

@@ -85,6 +85,7 @@ const addCategory = asyncHandler(async (req, res, next) => {
   }
 
   const category = await Category.create(categoryObj);
+  client.del("categories");
   successResponse(res, {
     statusCode: 201,
     data: category,

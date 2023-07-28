@@ -21,7 +21,7 @@ const router = express.Router();
 
 router.post(
   "/register",
-  // upload.single("image"),
+  upload.single("image"),
   validate(authValidation.register),
   register
 );

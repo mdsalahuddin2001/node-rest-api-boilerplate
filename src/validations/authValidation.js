@@ -7,6 +7,7 @@ const register = {
     phone: Joi.string().required(),
     address: Joi.string().required(),
     password: Joi.string().required(),
+    image: Joi.string(),
   }),
 };
 

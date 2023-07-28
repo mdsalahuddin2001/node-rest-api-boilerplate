@@ -25,9 +25,10 @@ const register = asyncHandler(async (req, res, next) => {
   // if (!req.file) {
   //   throw createError(400, "Please upload an image");
   // }
-  // if (req.file) {
-  //   const imageBufferString = req.file.buffer.toString("base64");
-  // }
+  let imageBufferString;
+  if (req.file) {
+    imageBufferString = req.file.buffer.toString("base64");
+  }
 
   // check if user already exists
   const userExists = await User.exists({ email });
@@ -38,21 +39,21 @@ const register = asyncHandler(async (req, res, next) => {
     );
   }
   const token = createJWT(
-    { name, email, password, phone, address },
+    { name, email, password, phone, address, image: imageBufferString },
     jwtActivationSecret,
     jwtActivationExpire
   );
 
   const activationUrl = `http://localhost:3000/auth/activate-account?token=${token}`;
-  await sendEmail({
-    email,
-    subject: "Email Verification",
-    html: verifyEmail({ email, activationUrl }),
-  });
+  // await sendEmail({
+  //   email,
+  //   subject: "Email Verification",
+  //   html: verifyEmail({ email, activationUrl }),
+  // });
 
   successResponse(res, {
     statusCode: 200,
-    data: { email, name, phone, address, token },
+    data: { email, name, phone, address, image: imageBufferString, token },
   });
 });
 // @desc      Verify user
