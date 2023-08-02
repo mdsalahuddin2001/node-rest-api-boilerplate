@@ -1,4 +1,5 @@
 const data = require("../data");
+const Product = require("../models/Product");
 const User = require("../models/User");
 // @desc      seed users
 // @route     GET /api/seed/users/
@@ -18,5 +19,23 @@ const seedUsers = async (req, res, next) => {
     next(error);
   }
 };
+// @desc      seed products
+// @route     GET /api/seed/products/
+// @access    Private - [Admin]
+const seedProducts = async (req, res, next) => {
+  try {
+    // delete all products
+    await Product.deleteMany({});
+    // insert new demo products
+    const products = await Product.insertMany(data.products);
 
-module.exports = { seedUsers };
+    res.status(201).json({
+      message: "Products were seeded",
+      products,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { seedUsers, seedProducts };

@@ -7,11 +7,11 @@ const { successResponse } = require("../utils/sendResponse");
 const asyncHandler = require("../middlewares/asyncHandler");
 const logger = require("../utils/logger");
 
-const client = redis.createClient();
+// const client = redis.createClient();
 
-client.connect().then(() => {
-  logger.log("info", "Connected to redis");
-});
+// client.connect().then(() => {
+//   logger.log("info", "Connected to redis");
+// });
 
 // ****** Create Category List With Children For Parent Category ****** //
 function createCategories(categories, parentId = null) {
@@ -35,8 +35,8 @@ function createCategories(categories, parentId = null) {
 
 // middleware for category caching on get request
 const categoryCache = asyncHandler(async (req, res, next) => {
-  const categories = await client.get("categories");
-
+  // const categories = await client.get("categories");
+  let categories = undefined;
   if (categories) {
     successResponse(res, {
       data: JSON.parse(categories),
@@ -59,7 +59,7 @@ const getCategories = asyncHandler(async (req, res, next) => {
   const categoryList = createCategories(categories);
 
   // cache categories in redis
-  client.set("categories", JSON.stringify(categoryList));
+  // client.set("categories", JSON.stringify(categoryList));
 
   successResponse(res, {
     data: categoryList,
@@ -85,7 +85,7 @@ const addCategory = asyncHandler(async (req, res, next) => {
   }
 
   const category = await Category.create(categoryObj);
-  client.del("categories");
+  // client.del("categories");
   successResponse(res, {
     statusCode: 201,
     data: category,
